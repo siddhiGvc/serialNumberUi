@@ -57,7 +57,7 @@ export default function SignIn() {
         const Data= {email: data.get('email'),
             password: data.get('password')}
         // console.log(data);
-        if(Data.email=="vinay" || Data.email=="mohan" || Data.email=="ceomohan" || Data.email =="bmc1")
+        if(Data.email=="vinay" || Data.email=="mohan" || Data.email=="ceomohan" || Data.email =="bmc1" || Data.email=="siddhi")
         {
         fetch(`${SERVER_API}/pub/login`,{
             method:'POST',
@@ -81,7 +81,7 @@ export default function SignIn() {
 
         if(json.data.user.isAdmin)
         {
-            localStorage.setItem('name',json.data.user.name);
+            window.sessionStorage.setItem('name',json.data.user.name);
             window.sessionStorage.setItem('token', json.data.token);
             showAlertMessage();
             setType("Success");

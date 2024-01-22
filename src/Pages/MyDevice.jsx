@@ -7,84 +7,144 @@ import 'datatables.net-bs4/js/dataTables.bootstrap4.min.js';
 import 'jquery'; // Ensure jquery is imported before bootstrap if using jQuery
 import 'bootstrap-switch/dist/js/bootstrap-switch.min.js';
 import 'select2/dist/js/select2.full.min.js';
-
+import { Modal, Button } from 'react-bootstrap';
 
 import $ from "jquery"
+import { Form } from 'react-bootstrap';
 import { useEffect,useState } from 'react';
 import {useNavigate,Link} from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
+import { TESTING } from '../API/secrect';
 import gvc from "../assets/GVC corp logo.png";
+import bulb from "../assets/bulb.png";
+import fan from "../assets/fan.png"
+
+
 
 export default function MyDevices(){
-   
-    const navigate=useNavigate();
-    useEffect(() => {
-       
-        $('[name="my-checkbox"]').bootstrapSwitch();
-    
-        // Cleanup when the component unmounts
-        return () => {
-          $('[name="my-checkbox"]').bootstrapSwitch('destroy');
-        };
-
-      },[]); // Empty dependency array ensures the effect runs only once
-    
-
-useEffect(()=>{
+   const [data,setData]=useState([]);
+   const [showModal, setShowModal] = useState(false);
+   const navigate=useNavigate();
+  
+  const handleShow = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
+  
   
 
    
-        $.get(`http://localhost:4001/lightingDevice/getJunction`, {
-    
-       })
-           .then(r => {
-              console.log(r);
-              if ($.fn.DataTable.isDataTable('#tblUser')) {
-                   $('#tblUser').DataTable().destroy();
-                     }
-                  var sr = 1;
-                   // Initialize DataTable with retrieved data
-                   $('#tblUser').DataTable({
-                       data: r, // Use fetched data directly
-                       columns: [
-                               { render: _ => sr++ },
-                               { data: 'User.name' },
-                               { data: 'Device.deviceName' },
-                               { data: 'Device.type' },
-                               {
-                                data: 'Device.status',
-                                render: function (data, type, row) {
-                                    // Check the value of Device.status and render accordingly
-                                    if (type === 'display') {
-                                        return data ? 'On' : 'Off';
-                                    }
-                                    return data;
-                                }
-                               
-                               },
-                               {
-                                data: 'Device.status',
-                                render: function (data, type, row) {
-                                    // Check the value of Device.status and render accordingly
-                                    if (type === 'display') {
-                                        return data ? '<input type="checkbox" name="my-checkbox" checked>' : '<input type="checkbox" name="my-checkbox">';
-                                    }
-                                    return '<input type="checkbox" name="my-checkbox" checked>';
-                                }
-                            }
-                           
-                           
-                            
+     var i=0;
+
+     const buttons = c => `
+        <button class="btn btn-sm btn-outline-warning mx-2" onclick="EditNumber()">Edit</button>
+        <button class="btn btn-sm btn-outline-danger mx-2" onClick="DeleteNumber()">Delete</button>
+    `;
+      const LoadData=()=>{
+        $.get(`${TESTING}/machineNumber/getAll`)
+             .then(r => {
+                console.log(r);
+                 setData(r);
+                if ($.fn.DataTable.isDataTable('#tblUser')) {
+                     $('#tblUser').DataTable().destroy();
+                       }
+                 
+                    var sr = 1;
+                     // Initialize DataTable with retrieved data
+                     $('#tblUser').DataTable({
+                         data: r, // Use fetched data directly
+                         columns: [
+                                 { render: _ => sr++ },
+                                 {data:'serial'},
+                                 { render: (a, b, c) => buttons(c), className: 'd-flex' },
+                                 { render: (a, b, c) => btoa(escape(JSON.stringify(c))), className: 'd-none' },
                              
-                       ],
-                       // Other configurations as needed
-                   });
-           })
-           .catch(ex => {console.log("Error") });
+                             
+                              
+                               
+                         ],
+                         // Other configurations as needed
+                     });
+             })
+             .catch(ex => {console.log(ex) });
+
+      }
+
+useEffect(()=>{
+   LoadData();
+  
+
    
 
 },[])
+
+
+const AddNumber=()=>{
+
+    const value= $('[name=machineId]').val();
+    console.log(value);
+    fetch(`${TESTING}/machineNumber/add`,{
+        method:"POST",
+        headers:{
+            "Content-type":"application/json",
+            "x-token":sessionStorage.getItem("token")
+        },
+        body:JSON.stringify(value)
+
+    })
+    .then((res)=>{
+        console.log(res.json());
+
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+}
+const EditNumber=()=>{
+
+    const value= $('[name=machineId]').val();
+    console.log(value);
+    fetch(`${TESTING}/machineNumber/edit`,{
+        method:"POST",
+        headers:{
+            "Content-type":"application/json",
+            "x-token":sessionStorage.getItem("token")
+        },
+        body:JSON.stringify(value)
+
+    })
+    .then((res)=>{
+        console.log(res.json());
+
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+}
+
+const DeleteNumber=()=>{
+
+    const value= $('[name=machineId]').val();
+    console.log(value);
+    fetch(`${TESTING}/machineNumber/delete`,{
+        method:"POST",
+        headers:{
+            "Content-type":"application/json",
+            "x-token":sessionStorage.getItem("token")
+        },
+        body:JSON.stringify(value)
+
+    })
+    .then((res)=>{
+        console.log(res.json());
+
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+}
+
+
+ 
 
 const Logout=()=>{
     sessionStorage.removeItem('token');
@@ -102,11 +162,18 @@ const Logout=()=>{
           <p style={{cursor:'pointer',fontSize:'20px'}} onClick={Logout}>Logout    <FontAwesomeIcon icon={faPowerOff} /> </p>
          </div>
          </div>
-    <div style={{width:'100%',backgroundColor:"rgba(88, 115, 254, 0.04)",paddingBottom:"70px"}}></div>
+    {/* <div style={{width:'100%',backgroundColor:"rgba(88, 115, 254, 0.04)",paddingBottom:"70px"}}></div> */}
 
-<div class="row" id="container">
+<div class="row w-70 align-ceneter" id="container" style={{display:'flex',justifyContent:"center"}}>
     <div class="col-lg-12">
-        <div class="card">
+        <div class="card " style={{paddingLeft:"100px",paddingRight:"100px",paddingTop:"20px"}}>
+        <div class="card-header">
+                <h4 class="card-title " style={{display:'flex', justifyContent:'space-between'}}>
+                    Serial Numbers
+                    <button class="btn btn-sm btn-success mx-2 text-white float-right" onClick={handleShow}>Add</button>
+                  
+                </h4>
+            </div>
           
            
             <div class="card-body">
@@ -114,21 +181,54 @@ const Logout=()=>{
                     <thead>
                         <tr>
                             <th>Sr No</th>
-                            <th>User Name</th>
-                            <th>Device Name</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Switch</th>
+                            <th>Serial Number</th>
+                         
+                            <th>Edit</th>
+                            <th>Delete</th>
+                          
                           
                         </tr>
                     </thead>
                     <tbody>
+
+                      
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+<Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Machine Number</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <div class="row">
+                   
+                    <div class="col-md-6">
+                        <div class="form-group my-2">
+                            <label>Machine Number</label>
+                            <input type="text" class="form-control" name="machineId" />
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+        </Modal.Body>
+        <Modal.Footer>
+        <Button variant="primary" onClick={AddNumber}>
+            Add
+          </Button>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          {/* Additional buttons or actions */}
+        </Modal.Footer>
+      </Modal>
+<script>
+   {/* $('[name="my-checkbox"]').bootstrapSwitch(); */}
+
+   console.log(1);
+</script>
 
 
 

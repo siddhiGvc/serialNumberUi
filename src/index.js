@@ -5,12 +5,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import AllRoutes from './Routes/AllRoutes';
 import { BrowserRouter } from 'react-router-dom';
+import { StrictMode } from 'react';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  
+  <StrictMode>
     <BrowserRouter>
       <AllRoutes/>
     </BrowserRouter>
+    </StrictMode>
    
  
 );
