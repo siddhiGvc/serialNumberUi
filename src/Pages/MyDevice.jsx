@@ -1,11 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'datatables.net-bs4/css/dataTables.bootstrap4.min.css';
-import 'bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css';
+
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import 'datatables.net-bs4/js/dataTables.bootstrap4.min.js';
 import 'jquery'; // Ensure jquery is imported before bootstrap if using jQuery
-import 'bootstrap-switch/dist/js/bootstrap-switch.min.js';
+
 import 'select2/dist/js/select2.full.min.js';
 import { Modal, Button } from 'react-bootstrap';
 
