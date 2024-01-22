@@ -35,12 +35,12 @@ export default function MyDevices(){
    
      var i=0;
 
-     const buttons = c => `
-        <button class="btn btn-sm btn-outline-warning mx-2" onclick="EditNumber()">Edit</button>
-        <button class="btn btn-sm btn-outline-danger mx-2" onClick="DeleteNumber()">Delete</button>
+     const buttons = b => `
+      
+        <button class="btn btn-sm btn-outline-danger mx-2" onclick="DeleteNumber(this)">Delete</button>
     `;
       const LoadData=()=>{
-        $.get(`${TESTING}/machineNumber/getAll`)
+        $.get(`${TESTING}/getAll`)
              .then(r => {
                 console.log(r);
                  setData(r);
@@ -55,8 +55,11 @@ export default function MyDevices(){
                          columns: [
                                  { render: _ => sr++ },
                                  {data:'serial'},
-                                 { render: (a, b, c) => buttons(c), className: 'd-flex' },
-                                 { render: (a, b, c) => btoa(escape(JSON.stringify(c))), className: 'd-none' },
+                                 {render:function(data,type,row){
+                                    return `  <button class="btn btn-sm btn-outline-danger mx-2" onclick="DeleteNumber(${row.serial})">Delete</button>`
+                                 }}
+                                //  { render: (a, b, c) => buttons(b), className: 'd-flex' },
+                                //  { render: (a, b, c) => btoa(escape(JSON.stringify(c))) },
                              
                              
                               
@@ -65,12 +68,15 @@ export default function MyDevices(){
                          // Other configurations as needed
                      });
              })
-             .catch(ex => {console.log(ex) });
+             .catch(ex =>{});
 
       }
 
 useEffect(()=>{
    LoadData();
+   setInterval(()=>{
+   LoadData();
+   },3000)
   
 
    
@@ -82,13 +88,13 @@ const AddNumber=()=>{
 
     const value= $('[name=machineId]').val();
     console.log(value);
-    fetch(`${TESTING}/machineNumber/add`,{
+    fetch(`${TESTING}/add`,{
         method:"POST",
         headers:{
             "Content-type":"application/json",
             "x-token":sessionStorage.getItem("token")
         },
-        body:JSON.stringify(value)
+        body:JSON.stringify({machineNumber:value})
 
     })
     .then((res)=>{
@@ -103,13 +109,13 @@ const EditNumber=()=>{
 
     const value= $('[name=machineId]').val();
     console.log(value);
-    fetch(`${TESTING}/machineNumber/edit`,{
+    fetch(`${TESTING}/edit`,{
         method:"POST",
         headers:{
             "Content-type":"application/json",
             "x-token":sessionStorage.getItem("token")
         },
-        body:JSON.stringify(value)
+        body:JSON.stringify({machineNumber:value})
 
     })
     .then((res)=>{
@@ -121,17 +127,17 @@ const EditNumber=()=>{
     })
 }
 
-const DeleteNumber=()=>{
+window.DeleteNumber=(sr)=>{
+//     var rd = getRowContent(ctrl);
+   console.log(sr);
 
-    const value= $('[name=machineId]').val();
-    console.log(value);
-    fetch(`${TESTING}/machineNumber/delete`,{
+    fetch(`${TESTING}/delete`,{
         method:"POST",
         headers:{
             "Content-type":"application/json",
             "x-token":sessionStorage.getItem("token")
         },
-        body:JSON.stringify(value)
+        body:JSON.stringify({machineNumber:sr})
 
     })
     .then((res)=>{
@@ -182,8 +188,7 @@ const Logout=()=>{
                         <tr>
                             <th>Sr No</th>
                             <th>Serial Number</th>
-                         
-                            <th>Edit</th>
+                           
                             <th>Delete</th>
                           
                           
