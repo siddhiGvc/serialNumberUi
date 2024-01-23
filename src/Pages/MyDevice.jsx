@@ -9,7 +9,8 @@ import 'jquery'; // Ensure jquery is imported before bootstrap if using jQuery
 import 'select2/dist/js/select2.full.min.js';
 import { Modal, Button } from 'react-bootstrap';
 
-import $ from "jquery"
+import $ from "jquery";
+import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useEffect,useState } from 'react';
 import {useNavigate,Link} from "react-router-dom";
@@ -19,18 +20,46 @@ import { TESTING } from '../API/secrect';
 import gvc from "../assets/GVC corp logo.png";
 import bulb from "../assets/bulb.png";
 import fan from "../assets/fan.png"
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
 
 
 
 export default function MyDevices(){
    const [data,setData]=useState([]);
    const [showModal, setShowModal] = useState(false);
+   const [open,setOpen]=useState(false);
+   const [message,setMessage]=useState("");
+   const [type,setType]=React.useState("");
+  
    const navigate=useNavigate();
   
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
   
-  
+//   const handleClose = (event, reason) => {
+//     if (reason === 'clickaway') {
+//       return;
+//     }
+
+//     setOpen(false);
+//   };
+
+ 
+
+  const showAlertMessage = () => {
+    setOpen(true);
+
+    // You can optionally set a timeout to hide the alert after a few seconds
+    setTimeout(() => {
+    setOpen(false);
+    }, 2000); // Hide the alert after 5 seconds (5000 milliseconds)
+};
 
    
      var i=0;
@@ -99,10 +128,16 @@ const AddNumber=()=>{
     })
     .then((res)=>{
         console.log(res.json());
+        showAlertMessage();
+        setMessage("Added Succesfully !");
+        setType("success");
 
     })
     .catch((err)=>{
         console.log(err);
+        showAlertMessage();
+        setMessage(err.message);
+        setType("error");
     })
 }
 const EditNumber=()=>{
@@ -142,10 +177,17 @@ window.DeleteNumber=(sr)=>{
     })
     .then((res)=>{
         console.log(res.json());
+        
+        showAlertMessage();
+        setMessage("Deleted Succesfully !");
+        setType("success");
 
     })
     .catch((err)=>{
         console.log(err);
+        showAlertMessage();
+        setMessage(err.message);
+        setType("error");
     })
 }
 
@@ -160,6 +202,15 @@ const Logout=()=>{
 
 
     return <>
+     <Stack spacing={2} sx={{ width: '100%' }}>
+    
+    <Snackbar  anchorOrigin={{ vertical:'top', horizontal:'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>
+        {message}
+      </Alert>
+    </Snackbar>
+
+  </Stack>
     <div style={{display:'flex',justifyContent:"space-between",padding:"15px",paddingLeft:'40px',paddingRight:'40px',alignItems:'center',position:'sticky',backgroundColor:"white",boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px'}}>
          <div>
           <img style={{width:'150px',height:'50px'}} src={gvc} />
